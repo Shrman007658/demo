@@ -14,19 +14,22 @@ import java.util.List;
 @Service
 public class TopScoreCalculatorService implements ScoreService{
 
-    @Autowired
     ScoreRepository scoreRepository;
-    @Autowired
+
     ResponseModel responseModel;
-    @Autowired
     TimeCheckpointRepository timeCheckpointRepository;
+    @Autowired
+    public TopScoreCalculatorService(ScoreRepository scoreRepository, ResponseModel responseModel, TimeCheckpointRepository timeCheckpointRepository) {
+        this.scoreRepository = scoreRepository;
+        this.responseModel = responseModel;
+        this.timeCheckpointRepository = timeCheckpointRepository;
+    }
     @Override
     public ResponseModel getTopScores(int count) {
         List<PlayerData> topNPlayers = scoreRepository.getTopScores(count);
         // Ensure that responseModel is properly initialized and populated
         responseModel.setPlayers(topNPlayers);
-        Instant instant = Instant.ofEpochMilli(timeCheckpointRepository.getLatestCheckpoint());
-        String timestamp= DateTimeFormatter
+        Instant instant = Instant.ofEpochMilli(timeCheckpointRepository.getLatestCheckpoint());        String timestamp= DateTimeFormatter
                 .ofPattern("yyyy-MM-dd HH:mm:ss")
                 .withZone(ZoneId.of("UTC"))
                 .format(instant);
