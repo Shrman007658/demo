@@ -1,26 +1,36 @@
 package com.craft.demo.service;
 
-import com.craft.demo.entities.Player;
 import com.craft.demo.model.PlayerData;
+import com.craft.demo.model.ResponseModel;
 import com.craft.demo.repository.ScoreRepository;
+import com.craft.demo.repository.TimeCheckpointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import com.craft.demo.repository.ScoreRepository;
 @Service
 public class TopScoreCalculatorService implements ScoreService{
 
     @Autowired
     ScoreRepository scoreRepository;
+    @Autowired
+    ResponseModel responseModel;
+    @Autowired
+    TimeCheckpointRepository timeCheckpointRepository;
     @Override
-    public List<PlayerData> getTopScores(int count) {
+    public ResponseModel getTopScores(int count) {
         List<PlayerData> topNPlayers = scoreRepository.getTopScores(count);
-        for(PlayerData pl : topNPlayers)
-        {
-            System.out.println(pl.getName());
-        }
-        return topNPlayers;
+        // Ensure that responseModel is properly initialized and populated
+        responseModel.setPlayers(topNPlayers);
+        Instant instant = Instant.ofEpochMilli(timeCheckpointRepository.getLatestCheckpoint());
+        String timestamp= DateTimeFormatter
+                .ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("UTC"))
+                .format(instant);
+        responseModel.setReportUpdatedTimestamp(timestamp);
+        return responseModel;
     }
 }

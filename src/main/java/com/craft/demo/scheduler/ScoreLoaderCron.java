@@ -1,25 +1,39 @@
 package com.craft.demo.scheduler;
 
+import com.craft.demo.model.PlayerData;
 import com.craft.demo.repository.ScoreRepository;
 import com.craft.demo.repository.TimeCheckpointRepository;
 import com.craft.demo.utils.FileUtilities;
+import com.craft.demo.utils.fileReaders.FileReader;
+import com.craft.demo.utils.fileReaders.FileReaderFactory;
 import jakarta.transaction.Transactional;
-import org.apache.commons.csv.CSVParser;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.io.FileNotFoundException;
+import java.util.List;
 
 @Component
 public class ScoreLoaderCron {
 
     Long lastUpdatedTimestamp=0L;
-    @Autowired
+
     FileUtilities fileUtilities;
-    @Autowired
+    FileReaderFactory fileReaderFactory;
     ScoreRepository repository;
-    @Autowired
     TimeCheckpointRepository timeCheckpointRepository;
+    String fileLocation;
+
+    public ScoreLoaderCron(FileReaderFactory fileReaderFactory,FileUtilities fileUtilities, ScoreRepository repository, TimeCheckpointRepository timeCheckpointRepository, @Value("${scoreReader.file.location}")String fileLocation) {
+        this.fileReaderFactory=fileReaderFactory;
+        this.lastUpdatedTimestamp = 0L;
+        this.fileUtilities = fileUtilities;
+        this.repository = repository;
+        this.timeCheckpointRepository = timeCheckpointRepository;
+        this.fileLocation = fileLocation;
+    }
+
     @Scheduled(cron = "${scoreReader.cron.cronTime}")
     @Transactional
     public void loadScoresToDb()
@@ -31,38 +45,44 @@ public class ScoreLoaderCron {
             lastUpdatedTimestamp = timeCheckpointRepository.getLatestCheckpoint();
             if(lastUpdatedTimestamp==null)
                 lastUpdatedTimestamp=0L;
-            System.out.println(lastUpdatedTimestamp);
             if(lastUpdatedTimestamp < fileUtilities.getLastAlteredTimestamp())
             {
-                CSVParser parser = null;
-                parser = fileUtilities.readCSVFile();
-                if (parser != null)
-                {
                     System.out.println("Parsing!! ");
-                    parser.stream().forEach((record) ->
+                    List<PlayerData> playerDataList= fileReaderFactory.getFileReader("csv").readFile(fileLocation);
+                    playerDataList.forEach(player ->
                     {
-                        String playerId = record.get("playerId");
-                        String playerName= record.get("playerName");
-                        String playerScore=record.get("playerScore");
-                        System.out.println(playerScore+ " " + playerId);
+                        Long playerId = player.getPlayerId();
+                        String playerName=player.getPlayerName();
+                        Long playerScore = player.getPlayerScore();
                         int numOfUpdated=repository.updateScore(playerId,playerScore);
                         if(numOfUpdated==0)
-                            repository.insertNewPlayer(playerName,Long.parseLong(playerScore));
+                            repository.insertNewPlayer(playerName,playerScore);
 
                     });
-                    //Put the values in the DB
                     lastUpdatedTimestamp= fileUtilities.getLastAlteredTimestamp();
                     timeCheckpointRepository.updateTimestamp(lastUpdatedTimestamp);
-                }
+            }
+            else
+            {
+                System.out.println("The file has not been updated yet. Going to sleep...");
             }
 
+
+        }
+        catch(NumberFormatException num)
+        {
+            System.err.println("Incorrect Number format");
+            num.printStackTrace();
+        }
+        catch(FileNotFoundException file)
+        {
+            System.err.println("File does not exist");
+            file.printStackTrace();
         }
         catch(Exception e)
         {
+            System.err.println("Exception while running cron job");
             e.printStackTrace();
-        }
-        finally {
-
         }
     }
 }

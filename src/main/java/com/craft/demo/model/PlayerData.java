@@ -2,16 +2,16 @@ package com.craft.demo.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
 @Getter
-@Setter
 public class PlayerData {
-    private String name;
-    private Integer score;
+    private Long playerId;
+    private String playerName;
+    private Long playerScore;
 
-    public PlayerData(String name, Integer score) {
-        this.score = score;
-        this.name=name;
+    public PlayerData(Long playerId, String playerName, Long score) {
+        this.playerScore = score;
+        this.playerName=playerName;
+        this.playerId =playerId;
     }
 }

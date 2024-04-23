@@ -1,6 +1,7 @@
 package com.craft.demo.controller;
 
 import com.craft.demo.model.PlayerData;
+import com.craft.demo.model.ResponseModel;
 import com.craft.demo.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,9 +16,9 @@ public class ScoreController {
     @Autowired
     ScoreService scoreService;
     @GetMapping("/getTopScores")
-    public List<PlayerData> getTopNScores(@RequestParam(name="count" , defaultValue = "5") int count)
+    public ResponseModel getTopNScores(@RequestParam(name="count" , defaultValue = "5") int count)
 
     {
-        return scoreService.getTopScores(count);
+        return  scoreService.getTopScores(count);
     }
 }

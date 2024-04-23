@@ -15,7 +15,7 @@ public class Player {
     private String playerName;
 
     @Column(name="playerscore") // Specify custom column name
-    private int playerScore;
+    private Long playerScore;
 
     // Constructors, getters, and setters
 }
