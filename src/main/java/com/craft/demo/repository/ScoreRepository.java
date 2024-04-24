@@ -22,7 +22,7 @@ public interface ScoreRepository extends JpaRepository<Player,String> {
     @Query("UPDATE Player p SET p.playerScore = p.playerScore + :playerScore WHERE p.playerId = :playerId")
     int updateScore(@Param("playerId") Long playerId, @Param("playerScore") Long playerScore);
 
-    @Query("SELECT new com.craft.demo.model.PlayerData(u.playerId,u.playerName, u.playerScore)  from Player u order by playerScore DESC LIMIT :count")
+    @Query("SELECT new com.craft.demo.model.PlayerData(u.playerId,u.playerName, u.playerScore)  from Player u order by playerScore DESC, u.playerName ASC LIMIT :count")
     List<PlayerData> getTopScores(@Param("count") int count);
 
 }

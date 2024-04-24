@@ -1,4 +1,4 @@
-package com.craft.demo.utils;
+package com.craft.demo.utils.fileGetters;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
@@ -6,12 +6,11 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 @Component
-public class FileOperationsImpl implements FileOperations{
+public class FileGetterImplLocalStorage implements FileGetter {
     @Override
     public File getFile(String fileLocation) {
         try
         {
-            System.out.println("Wont print in test. Will print while running");//this is not printed in the test because this method is mocked.
             return FileUtils.getFile(fileLocation);
 
         }
