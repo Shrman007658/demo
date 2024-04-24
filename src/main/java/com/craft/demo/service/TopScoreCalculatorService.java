@@ -18,7 +18,7 @@ public class TopScoreCalculatorService implements ScoreService{
 
     ResponseModel responseModel;
     TimeCheckpointRepository timeCheckpointRepository;
-    @Autowired
+
     public TopScoreCalculatorService(ScoreRepository scoreRepository, ResponseModel responseModel, TimeCheckpointRepository timeCheckpointRepository) {
         this.scoreRepository = scoreRepository;
         this.responseModel = responseModel;
@@ -26,6 +26,8 @@ public class TopScoreCalculatorService implements ScoreService{
     }
     @Override
     public ResponseModel getTopScores(int count) {
+        if(count<1)
+            count=1;
         List<PlayerData> topNPlayers = scoreRepository.getTopScores(count);
         // Ensure that responseModel is properly initialized and populated
         responseModel.setPlayers(topNPlayers);

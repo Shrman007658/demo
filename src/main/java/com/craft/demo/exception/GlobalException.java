@@ -1,12 +1,17 @@
 package com.craft.demo.exception;
 
+import org.hibernate.exception.SQLGrammarException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-@ControllerAdvice
+import java.sql.SQLSyntaxErrorException;
+
+@RestControllerAdvice
 public class GlobalException {
 
     @ExceptionHandler(NullPointerException.class)
@@ -31,8 +36,8 @@ public class GlobalException {
                 .body("NumberFormatException: " + e.getMessage());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler({IllegalArgumentException.class,MethodArgumentTypeMismatchException.class, SQLSyntaxErrorException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
         // Log the exception or perform additional error handling if needed
         e.printStackTrace();
@@ -50,6 +55,6 @@ public class GlobalException {
 
         // Return a generic server error response
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Internal Server Error");
+                .body("");
     }
 }

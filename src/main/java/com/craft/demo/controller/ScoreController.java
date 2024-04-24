@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@RestController//@controller + @responseBody
 public class ScoreController {
 
     @Autowired
@@ -19,6 +19,7 @@ public class ScoreController {
     public ResponseModel getTopNScores(@RequestParam(name="count" , defaultValue = "5") int count)
 
     {
+
         return  scoreService.getTopScores(count);
     }
 }

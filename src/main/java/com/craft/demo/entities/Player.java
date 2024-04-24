@@ -11,11 +11,11 @@ public class Player {
     @Column(name="playerid")
     private Long playerId;
 
-    @Column(name="playername") // Specify custom column name
+    @Column(name="playername")
     private String playerName;
 
-    @Column(name="playerscore") // Specify custom column name
+    @Column(name="playerscore")
     private Long playerScore;
 
-    // Constructors, getters, and setters
+
 }
