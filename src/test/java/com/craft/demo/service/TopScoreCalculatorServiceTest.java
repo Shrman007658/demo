@@ -31,7 +31,7 @@ class TopScoreCalculatorServiceTest {
     @Mock
     TimeCheckpointRepository timeCheckpointRepository;
 
-    TopScoreCalculatorService topScoreCalculatorService; // Now using @InjectMocks
+    TopScoreCalculatorService topScoreCalculatorService;
 
 
     ResponseModel responseModel;
@@ -54,6 +54,22 @@ class TopScoreCalculatorServiceTest {
         when(timeCheckpointRepository.getLatestCheckpoint()).thenReturn(1619185811000L); // Example timestamp in milliseconds
         ResponseModel actualResponseModel = topScoreCalculatorService.getTopScores(2);
         assertEquals(actualResponseModel.getPlayers(),playerDataList);
+
+    }
+
+    @Test
+    void verifyMethodCalls()
+    {
+        List<PlayerData> playerDataList = new ArrayList<>();
+        playerDataList.add(new PlayerData(1L, "John", 100L));
+        playerDataList.add(new PlayerData(2L, "Alice", 90L));
+
+        // Mocked values for dependencies
+        when(scoreRepository.getTopScores(2)).thenReturn(playerDataList);
+        when(timeCheckpointRepository.getLatestCheckpoint()).thenReturn(1619185811000L);
+        topScoreCalculatorService.getTopScores(2);
+        verify(scoreRepository).getTopScores(2);
+        verify(timeCheckpointRepository).getLatestCheckpoint();
 
     }
 }

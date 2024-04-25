@@ -20,15 +20,15 @@ public class ScoreLoaderCron {
 
     FileUtilities fileUtilities;
     FileReaderFactory fileReaderFactory;
-    ScoreRepository repository;
+    ScoreRepository scoreRepository;
     TimeCheckpointRepository timeCheckpointRepository;
     String fileLocation;
 
-    public ScoreLoaderCron(FileReaderFactory fileReaderFactory,FileUtilities fileUtilities, ScoreRepository repository, TimeCheckpointRepository timeCheckpointRepository, @Value("${scoreReader.file.location}")String fileLocation) {
+    public ScoreLoaderCron(FileReaderFactory fileReaderFactory, FileUtilities fileUtilities, ScoreRepository scoreRepository, TimeCheckpointRepository timeCheckpointRepository, @Value("${scoreReader.file.location}")String fileLocation) {
         this.fileReaderFactory=fileReaderFactory;
         this.lastUpdatedTimestamp = 0L;
         this.fileUtilities = fileUtilities;
-        this.repository = repository;
+        this.scoreRepository = scoreRepository;
         this.timeCheckpointRepository = timeCheckpointRepository;
         this.fileLocation = fileLocation;
     }
@@ -53,9 +53,9 @@ public class ScoreLoaderCron {
                         Long playerId = player.getPlayerId();
                         String playerName=player.getPlayerName();
                         Long playerScore = player.getPlayerScore();
-                        int numOfUpdated=repository.updateScore(playerId,playerScore);
+                        int numOfUpdated= scoreRepository.updateScore(playerId,playerScore);
                         if(numOfUpdated==0)
-                            repository.insertNewPlayer(playerName,playerScore);
+                            scoreRepository.insertNewPlayer(playerName,playerScore);
 
                     });
                     lastUpdatedTimestamp= fileUtilities.getLastAlteredTimestamp();
